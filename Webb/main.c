@@ -51,28 +51,33 @@ int main(int argc, char * argv[]) {
         }
         read(sa, buf, BUF_SIZE);
 
-        char *file = getURLfromHTTPheader(buf);
+        if (buf[0] == '\n') { continue; } // sometimes empty buffers come, please ignore these.
+
+        char *file = getURLfromHTTPheader(buf); // todo: malloc schmalloc
         fd = open(file, O_RDONLY);
         if (fd < 0) {
             write(sa, "HTTP/1.1 404 Not Found\r\nServer: Saba\r\nContent-Length: 13\r\nContent-Type: text/plain\r\n\r\n404 Not Found", 100);
-            close(fd);
+            // close(fd); // don't close -1 file descriptors
             close(sa);
             continue;
         }
         off_t fsize = lseek(fd, 0, SEEK_END);
         lseek(fd, 0, SEEK_SET);
         char* header;
-        sprintf(header, "HTTP/1.1 200 OK\r\nServer: Saba\r\nContent-Length: %lld\r\nContent-Type: %s\r\n\r\n", fsize, getContentTypeFromURL(file));
+        int err = asprintf(&header, "HTTP/1.1 200 OK\r\nServer: Saba\r\nContent-Length: %lld\r\nContent-Type: %s\r\n\r\n", fsize, getContentTypeFromURL(file));
+        if (err == -1) { // om min broder asprintf stendör
+            printf("\033[0;32mbrorsan jag dog\n\033[0m");
+            return 1;
+        }
         write(sa, header, strlen(header));
         while (1) { // skicka filens data
             bytes = read(fd, buf, BUF_SIZE);
-            if (bytes <= 0) {
-                break;
-            }
+            if (bytes <= 0) { break; }
             write(sa, buf, bytes);
         }
         close(fd);
         close(sa);
+        buf[0] = '\n';
     }
 }
 
