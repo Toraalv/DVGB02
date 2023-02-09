@@ -83,8 +83,7 @@ int main(int argc, char * argv[]) {
 
 char* getURLfromHTTPheader(char* buf) {
     char* finalURL = strstr(buf, "/");
-    // ++ tar bort det första snedstrecket (alternativt) ¯\_(ツ)_/¯ 
-    return strtok(++finalURL, " ");
+    return strtok(++finalURL, " "); // ++ tar bort det första snedstrecket ¯\_(ツ)_/¯ 
 }
 
 char* getContentTypeFromURL(char* filepath) {
