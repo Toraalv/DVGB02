@@ -15,86 +15,88 @@ char* getURLfromHTTPheader(char* buf);
 char* getContentTypeFromURL(char* buf);
 
 int main(int argc, char * argv[]) {
-    int s, b, l, fd, sa, bytes, on = 1;
-    
-    struct sockaddr_in channel;
-    memset(&channel, 0, sizeof(channel));
-    channel.sin_family = AF_INET;
-    channel.sin_addr.s_addr = htonl(INADDR_ANY);
-    channel.sin_port = htons(PORT);
+	int s, b, l, fd, sa, bytes, on = 1;
 
-    s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (s < 0) {
-        printf("socket failed\n");
-        return 1;
-    }
-    setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char * ) &on, sizeof(on));
+	struct sockaddr_in channel;
+	memset(&channel, 0, sizeof(channel));
+	channel.sin_family = AF_INET;
+	channel.sin_addr.s_addr = htonl(INADDR_ANY);
+	channel.sin_port = htons(PORT);
 
-    b = bind(s, (struct sockaddr *) &channel, sizeof(channel));
-    if (b < 0) {
-        printf("bind failed\n");
-        return 1;
-    }
+	s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (s < 0) {
+		printf("socket failed\n");
+		return 1;
+	}
+	setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char * ) &on, sizeof(on));
 
-    l = listen(s, QUEUE_SIZE);
-    if (l < 0) {
-        printf("listen failed\n");
-        return 1;
-    }
+	b = bind(s, (struct sockaddr *) &channel, sizeof(channel));
+	if (b < 0) {
+		printf("bind failed\n");
+		return 1;
+	}
 
-    while (1) {
-        char buf[BUF_SIZE];
-        sa = accept(s, 0, 0);
-        if (sa < 0) {
-            printf("accept failed\n");
-            return 1;
-        }
-        read(sa, buf, BUF_SIZE);
+	l = listen(s, QUEUE_SIZE);
+	if (l < 0) {
+		printf("listen failed\n");
+		return 1;
+	}
 
-        if (buf[0] == '\n') { continue; } // sometimes empty buffers come, please ignore these.
+	printf("Server's running!\n");
 
-        char *file = getURLfromHTTPheader(buf); // todo: malloc schmalloc
-        fd = open(file, O_RDONLY);
-        if (fd < 0) {
-            write(sa, "HTTP/1.1 404 Not Found\r\nServer: Saba\r\nContent-Length: 13\r\nContent-Type: text/plain\r\n\r\n404 Not Found", 100);
-            // close(fd); // don't close -1 file descriptors
-            close(sa);
-            continue;
-        }
-        off_t fsize = lseek(fd, 0, SEEK_END);
-        lseek(fd, 0, SEEK_SET);
-        char* header;
-        int err = asprintf(&header, "HTTP/1.1 200 OK\r\nServer: Saba\r\nContent-Length: %lld\r\nContent-Type: %s\r\n\r\n", fsize, getContentTypeFromURL(file));
-        if (err == -1) { // om min broder asprintf stendör
-            printf("\033[0;32mbrorsan jag dog\n\033[0m");
-            return 1;
-        }
-        write(sa, header, strlen(header));
-        while (1) { // skicka filens data
-            bytes = read(fd, buf, BUF_SIZE);
-            if (bytes <= 0) { break; }
-            write(sa, buf, bytes);
-        }
-        close(fd);
-        close(sa);
-        buf[0] = '\n';
-    }
+	while (1) {
+		char buf[BUF_SIZE];
+		sa = accept(s, 0, 0);
+		if (sa < 0) {
+			printf("accept failed\n");
+			return 1;
+		}
+		read(sa, buf, BUF_SIZE);
+
+		if (buf[0] == '\n') { continue; } // ibland kommer tomma buffers, ignorera dem.
+
+		char *file = getURLfromHTTPheader(buf);
+		fd = open(file, O_RDONLY);
+		if (fd < 0) {
+			write(sa, "HTTP/1.1 404 Not Found\r\nServer: Saba\r\nContent-Length: 13\r\nContent-Type: text/plain\r\n\r\n404 Not Found", 100);
+			// close(fd); // stäng inte -1 file descriptors
+			close(sa);
+			continue;
+		}
+		off_t fsize = lseek(fd, 0, SEEK_END);
+		lseek(fd, 0, SEEK_SET);
+		char* header;
+		int err = asprintf(&header, "HTTP/1.1 200 OK\r\nServer: Saba\r\nContent-Length: %lld\r\nContent-Type: %s\r\n\r\n", fsize, getContentTypeFromURL(file));
+		if (err == -1) { // om min broder asprintf stendör
+			printf("\033[0;32mbrorsan jag dog\n\033[0m");
+			return 1;
+		}
+		write(sa, header, strlen(header));
+		while (1) { // skicka filens data
+			bytes = read(fd, buf, BUF_SIZE);
+			if (bytes <= 0) { break; }
+			write(sa, buf, bytes);
+		}
+		close(fd);
+		close(sa);
+		buf[0] = '\n';
+	}
 }
 
 char* getURLfromHTTPheader(char* buf) {
-    char* finalURL = strstr(buf, "/");
-    return strtok(++finalURL, " "); // ++ tar bort det första snedstrecket ¯\_(ツ)_/¯ 
+	char* finalURL = strstr(buf, "/");
+	return strtok(++finalURL, " "); // ++ tar bort det första snedstrecket ¯\_(ツ)_/¯
 }
 
 char* getContentTypeFromURL(char* filepath) {
-    char* string = strstr(filepath, ".");
+	char* string = strstr(filepath, ".");
 
-    if (!strcmp(string, ".png"))
-        return "image/png";
-    else if (!strcmp(string, ".jpg"))
-        return "image/jpeg";
-    else if (!strcmp(string, ".html"))
-        return "text/html"; 
-    else
-        return "application/octet-stream";
+	if (!strcmp(string, ".png"))
+		return "image/png";
+	else if (!strcmp(string, ".jpg"))
+		return "image/jpeg";
+	else if (!strcmp(string, ".html"))
+		return "text/html";
+	else
+		return "application/octet-stream";
 }

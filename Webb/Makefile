@@ -1,6 +1,3 @@
-# todo: make makefile
-
-
 pre-clean:
 	rm main.o mendokusai
 
