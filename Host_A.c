@@ -12,13 +12,15 @@ void A_output(struct msg message) {
 	sending_packet.seqnum = seqnum;
 	sending_packet.acknum = 0;
 	strcpy(sending_packet.payload, message.data);
+	sending_packet.checksum = make_checksum(sending_packet);
 	//B_input(sending_packet);
-	tolayer3(B, sending_packet); // send the packet to B
+	tolayer3(A, sending_packet); // send the packet to B
 }
 
 /* Called from layer 3, when a packet arrives for layer 4 */
 void A_input(struct pkt packet) {
 	printf("layer 3:\tseqnum: %d\n\t\tacknum: %d\n\t\tchecksum: %d\n\t\tpayload: %s\n", packet.seqnum, packet.acknum, packet.checksum, packet.payload);
+	tolayer5(B, packet.payload);
 	/* TODO */
 	// tydligen kommmer detta från B
 }
@@ -35,4 +37,14 @@ void A_timerinterrupt() {
 void A_init() {
 	printf("init som fan\n");
 	/* TODO */
+}
+
+int make_checksum(struct pkt packet) { // todo: på structen, inte bara payload/meddelandet
+	int cumSum = 0;
+	for (int i = 0; packet.payload[i] != '\0'; i++) {
+		cumSum += packet.payload[i];
+	}
+	cumSum = cumSum + packet.acknum;
+	cumSum = cumSum - packet.seqnum;
+	return cumSum;
 }
