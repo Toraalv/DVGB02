@@ -60,7 +60,8 @@ void enqueue(struct pkt item) {
 	for (int i = 0; i < pktQueueLen; i++)
 		newQueue[i] = pktQueue[i];
 	newQueue[pktQueueLen] = item;
-	pktQueue = newQueue; // minneslucka, men kbry // arvid
+	free(pktQueue); // :-)
+	pktQueue = newQueue;
 	pktQueueLen++;
 }
 
