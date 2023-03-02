@@ -4,11 +4,11 @@
 
 #define timeoutTime 1000
 
-bool isTimer = false;
+static bool isTimer = false;
 
-struct pkt *pktQueue;
-int pktQueueLen = 0;
-bool seqNum = 0, ackNum = 0; // då kan vi bara flippa dem
+static struct pkt *pktQueue;
+static int pktQueueLen = 0;
+static bool seqNum = 0, ackNum = 0; // då kan vi bara flippa dem
 
 /* Called from layer 5, passed the data to be sent to other side */
 void A_output(struct msg message) {

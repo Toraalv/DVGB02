@@ -2,7 +2,7 @@
 #include "Host_B.h"
 #include "checksum.h"
 
-bool nextExpected = 1;
+static bool nextExpected = 1;
 
 /* Called from layer 5, passed the data to be sent to other side */
 void B_output( struct msg message) {
