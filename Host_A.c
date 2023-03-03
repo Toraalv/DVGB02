@@ -40,7 +40,7 @@ void A_input(struct pkt packet) {
 
 void send_packet(struct pkt puck) {
 	isTimer = true;
-	tolayer3(A, puck); // send the packet to B
+	tolayer3(A, puck); // skicka paketet till B
 	starttimer(A, timeoutTime);
 }
 
@@ -65,7 +65,7 @@ void enqueue(struct pkt item) {
 	pktQueueLen++;
 }
 
-void dequeue() { // remove the first item from the array
+void dequeue() { // tar bort det första föremålet i vår array
 	for (int i = 0; i < pktQueueLen - 1; i++)
 		pktQueue[i] = pktQueue[i + 1]; // copium, tänkte jag, men det fungerar asballt asså // martin
 	pktQueueLen--;
