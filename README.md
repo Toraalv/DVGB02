@@ -1,15 +1,15 @@
 # DVGB02のラボレーション
-おっはー！これはDVGB02の「main」の枝です。相変わらず、めっちゃ枝があります。だからこちらでコードを押し込まなくてください。
+こんちゃ！これはDVGB02の「main」ブランチだ。相変わらず、３つブランチがあるので、ここでコードを書かないでください。
 
-**近道：**
-- [ラボ一](https://git.cse.kau.se/martpers111/dvgb02-laborationer/-/tree/labb1)
-- [ラボ二](https://git.cse.kau.se/martpers111/dvgb02-laborationer/-/tree/labb2)
-- [ラボ三](https://git.cse.kau.se/martpers111/dvgb02-laborationer/-/tree/labb3)
+**ブランチのリンク：**
+- [ラボ１](https://git.cse.kau.se/martpers111/dvgb02-laborationer/-/tree/labb1)
+- [ラボ２](https://git.cse.kau.se/martpers111/dvgb02-laborationer/-/tree/labb2)
+- [ラボ３](https://git.cse.kau.se/martpers111/dvgb02-laborationer/-/tree/labb3)
 
-## でも、僕はこちらでコードが欲しいです。
-潰すわよ。本当に。
+## でも、僕はここにコードが欲しいだ。
+潰すわよ、本当に。
 
 ![御坂美琴](https://i.imgur.com/Pm8FQ8D.png)
 
-じゃ、おやす　( ・∇・)<br>
+じゃ、おやすっ　( ・∇・)<br>
 マーティン
