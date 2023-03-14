@@ -1,6 +1,7 @@
 #include "node.h"
 
 struct distance_table dt3;
+static void printdt3(struct distance_table *dtptr);
 
 /* Students to write the following two routines, and maybe some others */
 
@@ -24,7 +25,31 @@ void rtinit3() {
 }
 
 void rtupdate3(struct rtpkt *rcvdpkt) {
-	/* TODO */
+	bool changed = false;
+	if (rcvdpkt->destid == 3) { // paketet är vårt
+		// todo: kolla om dett finns bättre rutter nu än vad vi har, och uppdatera
+		for (int i = 0; i < sizeof(rcvdpkt->mincost) / sizeof(rcvdpkt->mincost[3]); i++) {
+			if (rcvdpkt->sourceid == i) continue;
+			printf("from %d, %d: rcvdpkt mincost: %d, dt3.costs: %d\n", rcvdpkt->sourceid, i, rcvdpkt->mincost[i], dt3.costs[i][3]);
+			if (rcvdpkt->mincost[i] < dt3.costs[i][3]) {
+				dt3.costs[i][3] = rcvdpkt->mincost[i];
+				changed = true;
+			}
+		}
+	} else { // endast forwarda paketet
+		distribute_packet(*rcvdpkt);
+		printf("forwarding magi!");
+	}
+
+	if (changed) { // om det var vårt paket ska vi broadcasta att vi har förändrats
+		struct rtpkt new_broadcast = { .destid = INT_MAX, .sourceid = 3 };
+		for (int i = 0; i < TABLE_LEN; i++) {
+			new_broadcast.mincost[i] = dt3.costs[i][3]; // 何で mink-ost
+		}
+
+		distribute_packet(new_broadcast);
+		printdt3(&dt3);
+	}
 }
 
 void printdt3(struct distance_table *dtptr) {

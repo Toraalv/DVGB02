@@ -13,7 +13,7 @@ void distribute_packet(struct rtpkt pkt) {
 	// skicka packetet till alla アホ noder
 	for (int i = 0; i < TABLE_LEN; i++) {
 		if (i == pkt.sourceid) continue;
-        if ((pkt.sourceid % 2 == 1) && (i == 3 || i == 1)) continue;
+        if ((pkt.sourceid % 2 == 1) && (i % 2 == 1)) continue; // finns ingen koppling mellan 1 och 3.
 		pkt.destid = i;
 		tolayer2(pkt);
 	}

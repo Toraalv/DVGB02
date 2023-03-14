@@ -2,6 +2,7 @@
 #define NODE_H
 
 #include <stdio.h>
+#include <stdbool.h>
 #include <string.h>
 #include <limits.h>
 #include "sim_engine.h"
